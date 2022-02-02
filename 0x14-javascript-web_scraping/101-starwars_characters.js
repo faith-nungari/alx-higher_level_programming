@@ -1,51 +1,25 @@
 #!/usr/bin/node
-
 const request = require('request');
 
-/*
-let characters = [];
-let dict = {};
+const episodeId = process.argv[2];
 
-function addToDict (url, name) {
-  dict[url] = name;
-}
+if (parseInt(episodeId) < 8) {
+  const url = 'https://swapi-api.hbtn.io/api/films/' + episodeId;
 
-request('http://swapi.co/api/films/' + process.argv[2], function (error, response, body) {
-  if (error) {
-    console.error(error);
-  }
-  characters = JSON.parse(body).characters
-  characters.forEach(function (url) {
-    request(url, function (error, response, body) {
-      if (error) {
-        console.error(error);
-      }
-      addToDict(url, JSON.parse(body).name);
-    });
-  });
-  characters.forEach(function (item) {
-    console.log(dict[item]);
-  })
-});
-*/
-
-function helpRequest (arr, i) {
-  if (i === arr.length) {
-    return;
-  }
-  request(arr[i], function (error, response, body) {
-    if (error) {
-      console.error(error);
+  request(url, (err, res, body) => {
+    if (err) {
+      return console.log(err);
     }
-    console.log(JSON.parse(body).name);
-    helpRequest(arr, i + 1);
+    const { characters } = JSON.parse(body);
+
+    characters.forEach(
+      (url, index) => {
+        request(url, (err, res, body) => {
+          if (err) {
+            return console.log(err);
+          }
+          console.log(JSON.parse(body).name);
+        });
+      });
   });
 }
-
-request('http://swapi.co/api/films/' + process.argv[2], function (error, response, body) {
-  if (error) {
-    console.error(error);
-  }
-  const charac = JSON.parse(body).characters;
-  helpRequest(charac, 0);
-});
